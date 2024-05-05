@@ -18,19 +18,24 @@ class Vendor(models.Model):
 
 
 class PurchaseOrder(models.Model):
+    CHOICES = (
+        ("PENDING", "Pending"),
+        ("COMPLETED", "Completed"),
+        ("CANCELED", "Canceled")
+    )
     po_number = models.UUIDField(default=uuid.uuid4, editable=False)
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     order_date = models.DateTimeField(auto_now_add=True, blank=True)
     delivery_data = models.DateTimeField(blank=True)
     items = models.JSONField()
     quantity = models.IntegerField()
-    status = models.CharField(max_length=100)
+    status = models.CharField(max_length=100, choices=CHOICES, default="PENDING")
     quality_rating = models.FloatField()
     issue_date = models.DateTimeField()
     acknowledgement_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return self.po_number
+        return f"{self.po_number}"
 
 class HistoricalPerformance(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
