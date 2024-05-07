@@ -10,7 +10,7 @@ class VendorSerializer(serializers.HyperlinkedModelSerializer):
 class VendorPerformanceSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Vendor
-        fields = ['vendor_code', 'on_time_delivery_rate', 'quality_rating_avg', 'average_response_time', 'fulfillment_rate']
+        fields = ['on_time_delivery_rate', 'quality_rating_avg', 'average_response_time', 'fulfillment_rate']
 
 
 class POSerializer(serializers.ModelSerializer):
