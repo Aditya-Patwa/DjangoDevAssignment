@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import Vendor, PurchaseOrder, HistoricalPerformance
 from rest_framework import permissions, viewsets
-from .serializers import VendorSerializer, POSerializer, HPSerializer
+from .serializers import VendorSerializer, POSerializer, HPSerializer, VendorPerformanceSerializer
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
@@ -45,6 +45,19 @@ def vendor_detail(request, vendor_id):
 
 
 @csrf_exempt
+def vendor_performance(request, vendor_id):
+    try:
+        vendor = Vendor.objects.get(vendor_code=vendor_id)
+    except Vendors.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == "GET":
+        serializer = VendorPerformanceSerializer(vendor)
+        return JsonResponse(serializer.data)
+
+
+
+@csrf_exempt
 def po_list(request):
     if request.method == "GET":
         po = PurchaseOrder.objects.all()
@@ -60,4 +73,21 @@ def po_list(request):
 
 @csrf_exempt
 def po_detail(request, po_id):
-    pass
+    try:
+        po = PurchaseOrder.objects.get(po_number=po_id)
+    except PurchaseOrder.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'GET':
+        serializer = POSerializer(po)
+        return JsonResponse(serializer.data)
+    elif request.method == "PUT":
+        data = JSONParser().parse(request)
+        serializer = POSerializer(po, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors, status=400)
+    elif request.method == 'DELETE':
+        po.delete()
+        return HttpResponse(status=204)
